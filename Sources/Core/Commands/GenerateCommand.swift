@@ -76,6 +76,7 @@ public extension Xccov.Commands.Generate {
             .verbose(verbose,
                      onFailure: { failure in print("The following error occured while decoding the file: \(failure)") },
                      onSuccess: { _ in print("The json payload has been decoded") })
+            .map { Xccov.Filters.Packages.filterDuplicates(coverageReport: $0) }
             .map { Xccov.Filters.Targets.filter(coverageReport: $0, targetsToExclude: excludeTargets) }
             .verbose(verbose,
                      onFailure: { failure in print("The following error occured while excluding targets: \(failure)") },

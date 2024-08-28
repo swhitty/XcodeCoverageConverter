@@ -46,7 +46,18 @@ public extension Xccov.Converters.CoberturaXml {
         rootElement.addChild(packagesElement)
 
         // Sort files to avoid duplicated packages
-        let allFiles = coverageReport.targets.flatMap { $0.files }.sorted { $0.path > $1.path }
+        var files = [String: FileCoverageReport]()
+        for file in coverageReport.targets.flatMap(\.files) {
+            if let existing = files[file.path] {
+                if file.lineCoverage > existing.lineCoverage {
+                    files[file.path] = file
+                }
+            } else {
+                files[file.path] = file
+            }
+        }
+
+        let allFiles = files.values.sorted { $0.path > $1.path }
 
         var currentPackage = ""
         var currentPackageElement: XMLElement!
